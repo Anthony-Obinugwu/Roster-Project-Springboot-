@@ -2,21 +2,25 @@ package unpopulardev.ActivEdge_Roster;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "staff")
 public class Staff {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Automatically handles ID generation if needed
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String firstname;
     private String lastname;
 
-    @Enumerated(EnumType.STRING)  // Enum is stored as a string in the DB
+    @Enumerated(EnumType.STRING)
     private Roles role;
     private String specialDay;
 
-    // Constructors
+    private String workdays = "";
+
+
     public Staff() {}
 
     public Staff(int id, String firstname, String lastname, Roles role, String specialDay) {
@@ -31,7 +35,6 @@ public class Staff {
         this(id, firstname, lastname, role, null);
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -70,5 +73,13 @@ public class Staff {
 
     public void setSpecialDay(String specialDay) {
         this.specialDay = specialDay;
+    }
+
+    public String[] getWorkdays() {
+        return workdays != null ? workdays.split(",") : new String[]{};
+    }
+
+    public void setWorkdays(List<String> workdays) {
+        this.workdays = String.join(",", workdays);
     }
 }

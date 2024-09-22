@@ -9,5 +9,6 @@ public interface StaffService {
     Staff addStaff(Staff staff);
     Staff updateStaff(int id, Staff updatedStaff);
     void deleteStaff(int id);
+    void deleteAllStaff();
 }
 
