@@ -1,6 +1,7 @@
 package unpopulardev.ActivEdge_Roster;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +31,9 @@ public class StaffController {
     }
 
     @PostMapping
-    public Staff addStaff(@RequestBody Staff staff) {
-        return staffService.addStaff(staff);
+    public ResponseEntity<String> addStaff(@RequestBody Staff newStaff) {
+        staffService.addStaff(newStaff);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Staff member added successfully.");
     }
 
     @PutMapping("/{id}")
@@ -51,5 +53,16 @@ public class StaffController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @DeleteMapping("/all")
+    public ResponseEntity<Void> deleteAllStaff() {
+        staffService.deleteAllStaff();
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(DayLimitExceededException.class)
+    public ResponseEntity<String> handleDayLimitExceeded(DayLimitExceededException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }
