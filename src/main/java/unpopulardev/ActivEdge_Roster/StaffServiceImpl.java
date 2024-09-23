@@ -22,7 +22,7 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public Optional<Staff> getStaffById(int id) {
+    public Staff getStaffById(int id) {
         return staffRepository.findById(id);
     }
 

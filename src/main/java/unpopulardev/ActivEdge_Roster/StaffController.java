@@ -25,9 +25,10 @@ public class StaffController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Staff> getStaffById(@PathVariable int id) {
-        Optional<Staff> staff = staffService.getStaffById(id);
-        return staff.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<StaffDTO> getStaffById(@PathVariable int id) {
+        Staff staff = staffService.getStaffById( id);
+        StaffDTO staffDTO = new StaffDTO(staff.getFirstname(), staff.getLastname(), staff.getRole().name());
+        return ResponseEntity.ok(staffDTO);
     }
 
     @PostMapping

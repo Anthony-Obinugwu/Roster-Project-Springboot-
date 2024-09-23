@@ -17,12 +17,10 @@ public class Staff {
     @Enumerated(EnumType.STRING)
     private Roles role;
     private String specialDay;
-
     private String workdays = "";
 
 
     public Staff() {}
-
     public Staff(int id, String firstname, String lastname, Roles role, String specialDay) {
         this.id = id;
         this.firstname = firstname;
@@ -32,7 +30,11 @@ public class Staff {
     }
 
     public Staff(int id, String firstname, String lastname, Roles role) {
-        this(id, firstname, lastname, role, null);
+            this(id,
+                firstname,
+                lastname,
+                role,
+                null);
     }
 
     public int getId() {
