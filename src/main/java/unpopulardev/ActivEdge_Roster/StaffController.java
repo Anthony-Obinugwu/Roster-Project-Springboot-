@@ -26,9 +26,27 @@ public class StaffController {
 
     @GetMapping("/{id}")
     public ResponseEntity<StaffDTO> getStaffById(@PathVariable int id) {
-        Staff staff = staffService.getStaffById( id);
-        StaffDTO staffDTO = new StaffDTO(staff.getFirstname(), staff.getLastname(), staff.getRole().name());
-        return ResponseEntity.ok(staffDTO);
+        Optional<Staff> staff = staffService.getStaffById(id);
+        if (staff.isPresent()) {
+            Staff staffEntity = staff.get();
+            StaffDTO staffDTO = new StaffDTO(
+                    staffEntity.getFirstname(),
+                    staffEntity.getLastname(),
+                    staffEntity.getRole().name()
+            );
+            return ResponseEntity.ok(staffDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/workday/{day}")
+    public ResponseEntity<List<Staff>> getStaffByWorkday(@PathVariable String day) {
+        List<Staff> staffList = staffService.getStaffByWorkday(day);
+        if (staffList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(staffList);
     }
 
     @PostMapping

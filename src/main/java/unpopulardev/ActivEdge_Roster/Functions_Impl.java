@@ -9,101 +9,52 @@ public class Functions_Impl implements Functions {
 
     private static final List<String> VALID_WORKDAYS = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
 
+    private Map<String, Integer> dayCount = new HashMap<>();
+
+    public Functions_Impl() {
+        for (String day : VALID_WORKDAYS) {
+            dayCount.put(day, 0);
+        }
+    }
+    private void assignDays(List<Staff> staffList, List<String> workdays, Roles role, int dayLimit, int personLimitPerDay) {
+        if (workdays == null || workdays.isEmpty()) {
+            workdays = new ArrayList<>(VALID_WORKDAYS);
+        }
+
+        for (Staff staff : staffList) {
+            if (staff.getRole().equals(role)) {
+                List<String> availableDays = new ArrayList<>(workdays);
+
+                if (role.equals(Roles.CORPER) && staff.getSpecialDay() != null) {
+                    availableDays.remove(staff.getSpecialDay());
+                }
+                Collections.shuffle(availableDays);
+
+                List<String> assignedDays = new ArrayList<>();
+                for (String day : availableDays) {
+                    if (dayCount.get(day) < personLimitPerDay && assignedDays.size() < dayLimit) {
+                        assignedDays.add(day);
+                        dayCount.put(day, dayCount.get(day) + 1);
+                    }
+                }
+                staff.setWorkdays(assignedDays);
+                System.out.println(staff.getFirstname() + " " + staff.getLastname() + " is assigned to work on: " + assignedDays);
+            }
+        }
+    }
     @Override
     public void StaffAssign(List<Staff> StaffList, List<String> workdays) {
-        if (workdays == null || workdays.isEmpty()) {
-            workdays = VALID_WORKDAYS;
-        }
-
-        Map<String, Integer> dayCount = new HashMap<>();
-        for (String day : workdays) {
-            dayCount.put(day, 0);
-        }
-
-        for (Staff staff : StaffList) {
-            if (staff.getRole().name().equals("STAFF")) {
-                List<String> availableDays = new ArrayList<>(workdays);
-                Collections.shuffle(availableDays);
-
-                List<String> assignedDays = new ArrayList<>();
-                for (String day : availableDays) {
-                    // Assign only two days and make sure each day is not overcrowded (max 8 staff)
-                    if (dayCount.get(day) < 8 && assignedDays.size() < 2) {
-                        assignedDays.add(day);
-                        dayCount.put(day, dayCount.get(day) + 1);
-                    }
-                }
-
-                System.out.println(staff.getFirstname() + " " + staff.getLastname() + " is assigned to work on: " + assignedDays);
-            }
-        }
+        assignDays(StaffList, workdays, Roles.STAFF, 2, 12);
     }
 
     @Override
-    public void InternAssign(List<Staff> StaffList, List<String> days) {
-        if (days == null || days.isEmpty()) {
-            days = VALID_WORKDAYS;
-        }
-
-        Map<String, Integer> dayCount = new HashMap<>();
-        for (String day : days) {
-            dayCount.put(day, 0);
-        }
-
-        for (Staff staff : StaffList) {
-            if (staff.getRole().name().equals("INTERN")) {
-                List<String> availableDays = new ArrayList<>(days);
-                Collections.shuffle(availableDays);
-
-                List<String> assignedDays = new ArrayList<>();
-                for (String day : availableDays) {
-                    // Assign three days and limit interns to a max of 3 per day
-                    if (dayCount.get(day) < 3 && assignedDays.size() < 3) {
-                        assignedDays.add(day);
-                        dayCount.put(day, dayCount.get(day) + 1);
-                    }
-                }
-
-                System.out.println(staff.getFirstname() + " " + staff.getLastname() + " is assigned to work on: " + assignedDays);
-            }
-        }
+    public void InternAssign(List<Staff> StaffList, List<String> workdays) {
+        assignDays(StaffList, workdays, Roles.INTERN, 3, 12);
     }
 
     @Override
-    public void CorperAssign(List<Staff> StaffList, List<String> Days) {
-        if (Days == null || Days.isEmpty()) {
-            Days = VALID_WORKDAYS;
-        }
-
-        Map<String, Integer> dayCount = new HashMap<>();
-        for (String day : Days) {
-            dayCount.put(day, 0);
-        }
-
-        for (Staff staff : StaffList) {
-            if (staff.getRole().name().equals("CORPER")) {
-                List<String> availableDays = new ArrayList<>(Days);
-
-                // Exclude the special CDS day if it exists
-                String specialDay = staff.getSpecialDay();
-                if (specialDay != null && availableDays.contains(specialDay)) {
-                    availableDays.remove(specialDay);
-                }
-
-                Collections.shuffle(availableDays);
-
-                List<String> assignedDays = new ArrayList<>();
-                for (String day : availableDays) {
-                    // Assign three days and limit corpers to 3 per day
-                    if (dayCount.get(day) < 3 && assignedDays.size() < 3) {
-                        assignedDays.add(day);
-                        dayCount.put(day, dayCount.get(day) + 1);
-                    }
-                }
-
-                System.out.println(staff.getFirstname() + " " + staff.getLastname() + " is assigned to work on: " + assignedDays + ". CDS day: " + specialDay);
-            }
-        }
+    public void CorperAssign(List<Staff> StaffList, List<String> workdays) {
+        assignDays(StaffList, workdays, Roles.CORPER, 3, 12);
     }
 
 }

@@ -9,21 +9,22 @@ import java.util.*;
 public class DatabaseInitializer implements CommandLineRunner {
 
     private final StaffRepository staffRepository;
+    private final Functions_Impl functions;
 
-    public DatabaseInitializer(StaffRepository staffRepository) {
+    public DatabaseInitializer(StaffRepository staffRepository, Functions_Impl functions) {
         this.staffRepository = staffRepository;
+        this.functions = functions;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        // Initialize a map to track how many people are assigned to each day
+
         Map<String, Integer> dayCounts = new HashMap<>();
         List<String> allDays = List.of("Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
         for (String day : allDays) {
             dayCounts.put(day, 0);
         }
 
-        // Predefined staff list
         List<Staff> staffList = List.of(
                 new Staff(1, "Amietubodie ", "Otonye", Roles.STAFF),
                 new Staff(2, "Adedamola", "Babatunde", Roles.STAFF),
@@ -52,37 +53,12 @@ public class DatabaseInitializer implements CommandLineRunner {
                 new Staff(25, "Godspower", "Amun", Roles.CORPER, "Tuesday")
         );
 
-        // Assign random workdays to each staff and save
+        functions.StaffAssign(staffList, null);
+        functions.InternAssign(staffList, null);
+        functions.CorperAssign(staffList, null);
+
         for (Staff staff : staffList) {
-            String[] workdays = assignRandomWorkdaysForRole(staff, dayCounts);
-            staff.setWorkdays(List.of(workdays));
             staffRepository.save(staff);
         }
-    }
-
-    // Generate random workdays based on the staff role and available day count
-    private String[] assignRandomWorkdaysForRole(Staff staff, Map<String, Integer> dayCounts) {
-        List<String> availableDays = new ArrayList<>(List.of("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"));
-
-        // For Corpers, remove their special day from the available days
-        if (staff.getRole() == Roles.CORPER) {
-            String specialDay = staff.getSpecialDay();
-            availableDays.remove(specialDay); // Remove the special day from available days
-        }
-
-        // Assign days based on role
-        int limit = (staff.getRole() == Roles.INTERN || staff.getRole() == Roles.CORPER) ? 3 : 2;
-
-        Set<String> chosenDays = new HashSet<>(); // Use a set to ensure unique days
-        Collections.shuffle(availableDays); // Shuffle the available days
-
-        for (String day : availableDays) {
-            if (dayCounts.get(day) < 12 && chosenDays.size() < limit) { // Check for the 12-person limit and the required number of days
-                chosenDays.add(day);
-                dayCounts.put(day, dayCounts.get(day) + 1); // Increment count for the assigned day
-            }
-            if (chosenDays.size() == limit) break; // Stop if we've reached the desired number of days
-        }
-        return chosenDays.toArray(new String[0]); // Return the chosen days
     }
 }
